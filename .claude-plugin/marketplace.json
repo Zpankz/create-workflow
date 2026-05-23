@@ -1,0 +1,36 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "create-workflow",
+  "version": "1.2.0",
+  "owner": {
+    "name": "Zpankz",
+    "url": "https://github.com/Zpankz"
+  },
+  "metadata": {
+    "description": "Grill-driven scaffolding that designs complete workflow systems. Composes CLAUDE.md, rules, skills, hooks, agents, tools, and workflows as primitives."
+  },
+  "plugins": [
+    {
+      "name": "create-workflow",
+      "source": "./",
+      "description": "Grill-driven scaffolding that designs complete workflow systems from the ground up. Uses structured interrogation to compose CLAUDE.md, rules, skills, hooks, agents, tools, and workflows as primitives within a systems-thinking architecture.",
+      "version": "1.2.0",
+      "author": {
+        "name": "Zpankz",
+        "url": "https://github.com/Zpankz"
+      },
+      "homepage": "https://github.com/Zpankz/create-workflow",
+      "repository": "https://github.com/Zpankz/create-workflow",
+      "license": "MIT",
+      "keywords": [
+        "workflow",
+        "scaffolding",
+        "grill",
+        "systems-thinking",
+        "orchestration",
+        "context-engineering"
+      ],
+      "category": "development"
+    }
+  ]
+}
