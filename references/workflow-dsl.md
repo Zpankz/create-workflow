@@ -77,16 +77,25 @@ const result = await pipeline(
 );
 ```
 
-### `parallel(...thunks)`
+### `parallel(thunks)`
 
-Run async thunks concurrently:
+Run an array of thunks concurrently. **Takes a single array**, not variadic arguments. A thunk that throws resolves to `null`. Use `.filter(Boolean)` to remove nulls — but **never combine with positional destructuring** (filtering shifts positions).
 
 ```javascript
-const [security, performance, style] = await parallel(
+// Destructure when positions matter — handle nulls individually
+const [security, performance, style] = await parallel([
   () => agent("Security review of src/auth/"),
   () => agent("Performance review of src/db/"),
   () => agent("Style review of src/components/")
-);
+]);
+
+// Or filter when positions don't matter — never combine with destructure
+const results = await parallel([
+  () => agent("Security review of src/auth/"),
+  () => agent("Performance review of src/db/"),
+  () => agent("Style review of src/components/")
+]);
+const valid = results.filter(Boolean);
 ```
 
 ### `phase(name)`
