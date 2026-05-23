@@ -6,42 +6,70 @@ Claude Code plugin that designs and builds complete workflow systems from the gr
 
 ## Install
 
-### Claude Code
+### Claude Code (native)
 
 ```bash
 claude plugin install https://github.com/Zpankz/create-workflow
 ```
 
-### Pi
+### Pi (native)
 
 ```bash
 pi install https://github.com/Zpankz/create-workflow
 ```
 
-### Hermes
+### Hermes (skills only)
 
-```bash
-hermes plugins install Zpankz/create-workflow
-```
-
-Individual skills can also be installed:
+Individual skills can be installed directly:
 
 ```bash
 hermes skills install https://github.com/Zpankz/create-workflow/tree/main/skills/scaffold
+hermes skills install https://github.com/Zpankz/create-workflow/tree/main/skills/grill
 ```
+
+> Hermes `plugins install` accepts git URLs but its plugin manifest format is undocumented. Skill-level install is the verified path.
 
 ### Codex
 
-Clone and symlink into your Codex skills directory:
+Codex uses marketplace-based plugin distribution. Direct git install is not supported. To use the skills manually:
 
 ```bash
 git clone https://github.com/Zpankz/create-workflow.git
 ln -s "$(pwd)/create-workflow/skills" ~/.codex/skills/create-workflow
 ```
 
+> This symlinks skills into Codex's skill directory. It bypasses the plugin system — hooks and metadata from `.claude-plugin/plugin.json` are not loaded.
+
 ### Antigravity / Cursor
 
-These IDEs run Claude Code as their agent backend. Install the plugin via Claude Code (see above), then use skills normally in any Antigravity or Cursor workspace.
+These are IDE forks that run Claude Code as their agent backend. Install via Claude Code (see above), then use skills normally in any Antigravity or Cursor workspace.
+
+> Antigravity and Cursor do not have their own agent plugin systems.
+
+## Compatibility Matrix
+
+| Tool | Method | Plugin metadata | Skills | Hooks |
+|------|--------|----------------|--------|-------|
+| Claude Code | `claude plugin install` | Yes | Yes | Yes |
+| Pi | `pi install` | Yes | Yes | No |
+| Hermes | `hermes skills install` | No | Yes | No |
+| Codex | Manual symlink | No | Yes | No |
+| Antigravity | Via Claude Code | Via Claude Code | Via Claude Code | Via Claude Code |
+
+## Primitive Taxonomy
+
+```
+Semantic (natural language, interpreted by LLM)
+  ./CLAUDE.md              — generalised context
+  .claude/agents/*.md      — specialised context
+  .claude/skills/*/SKILL.md — conditionals (invoked on match or command)
+  .claude/rules/*.md       — constraints
+
+Programmatic (deterministic, executed by runtime)
+  .claude/settings.json    — constraints (hooks: PreToolUse, PostToolUse, Stop)
+  .mcp.json                — functions (MCP server configurations)
+  .claude/workflows/*.js   — orchestration (sandboxed JS VM, gated)
+```
 
 ## Skills
 
@@ -80,20 +108,6 @@ These IDEs run Claude Code as their agent backend. Install the plugin via Claude
   '- Phase 4: Verify — consistency, completeness, coherence
 ```
 
-## Systems Thinking
-
-Each primitive has a role in the workflow system:
-
-| Primitive | System Role | Analogy |
-|-----------|------------|---------|
-| CLAUDE.md | Shared memory | The team's wiki |
-| Rules | Laws | Constraints everyone follows |
-| Skills | Procedures | How-to guides for specific tasks |
-| Hooks | Reflexes | Automatic responses to events |
-| Agents | Team members | Specialists with focused expertise |
-| Tools | Equipment | External integrations |
-| Workflows | Nervous system | Orchestration that connects everything |
-
 ## Standalone Use
 
 Each generator works independently:
@@ -106,19 +120,6 @@ Each generator works independently:
 /scaffold --scan-only           # Just scan, report findings
 /scaffold --quick-grill         # Abbreviated interrogation (3-5 questions)
 ```
-
-## Compatibility
-
-The plugin uses the universal `skills/<name>/SKILL.md` format. Any AI coding tool that reads SKILL.md files can use these skills directly.
-
-| Tool | Install Method | Status |
-|------|---------------|--------|
-| Claude Code | `claude plugin install` | Native plugin support |
-| Pi | `pi install` | Git-based skill loading |
-| Hermes | `hermes plugins install` | Plugin + individual skill install |
-| Codex | Clone + symlink | Manual integration via skills directory |
-| Antigravity | Via Claude Code | Uses Claude Code as agent backend |
-| Cursor | Via Claude Code | Uses Claude Code as agent backend |
 
 ## References
 
