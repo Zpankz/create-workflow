@@ -134,7 +134,7 @@ export const meta = {
 };
 ```
 
-Pattern: `pipeline()` stages with `structuredOutput` passing typed data between stages.
+Pattern: `pipeline()` stages with `schema` passing typed data between stages.
 
 ## Dual-Track Strategy
 
@@ -177,7 +177,7 @@ Report violations inline and fix before writing. This prevents scripts from sile
 ## Generation Rules
 
 - Every `agent()` call gets explicit `tools` — don't leave it open
-- Use `structuredOutput` for typed handoffs between stages
+- Use `schema` for typed handoffs between stages
 - Add `phase()` markers for any workflow with 3+ stages
 - Use `log()` for user-visible progress, not debugging
 - Keep scripts focused — one workflow per concern
