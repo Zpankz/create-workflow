@@ -1,0 +1,15 @@
+name: create-workflow
+version: 1.2.0
+description: "Grill-driven scaffolding that designs complete workflow systems. Composes CLAUDE.md, rules, skills, hooks, agents, tools, and workflows as primitives."
+author: "Mikhail"
+license: MIT
+kind: standalone
+requires_env: []
+provides_tools: []
+provides_hooks:
+  - post_tool_call
+  - on_session_end
+hooks:
+  - post_tool_call
+  - on_session_end
+pip_dependencies: []

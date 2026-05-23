@@ -1,0 +1,26 @@
+{
+  "name": "create-workflow",
+  "version": "1.2.0",
+  "description": "Grill-driven scaffolding that designs complete workflow systems. Composes CLAUDE.md, rules, skills, hooks, agents, tools, and workflows as primitives.",
+  "author": "Mikhail <mikhail.hani@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zpankz/create-workflow.git"
+  },
+  "keywords": [
+    "workflow",
+    "scaffolding",
+    "grill",
+    "orchestration",
+    "claude-code"
+  ],
+  "pi": {
+    "extensions": [
+      "./pi/extensions/index.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}

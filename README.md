@@ -18,43 +18,47 @@ claude plugin install https://github.com/Zpankz/create-workflow
 pi install https://github.com/Zpankz/create-workflow
 ```
 
-### Hermes (skills only)
-
-Individual skills can be installed directly:
+### Antigravity / Gemini (native)
 
 ```bash
-hermes skills install https://github.com/Zpankz/create-workflow/tree/main/skills/scaffold
-hermes skills install https://github.com/Zpankz/create-workflow/tree/main/skills/grill
+gemini extensions install https://github.com/Zpankz/create-workflow
 ```
 
-> Hermes `plugins install` accepts git URLs but its plugin manifest format is undocumented. Skill-level install is the verified path.
-
-### Codex
-
-Codex uses marketplace-based plugin distribution. Direct git install is not supported. To use the skills manually:
+### Hermes (native)
 
 ```bash
-git clone https://github.com/Zpankz/create-workflow.git
-ln -s "$(pwd)/create-workflow/skills" ~/.codex/skills/create-workflow
+hermes plugins install https://github.com/Zpankz/create-workflow
 ```
 
-> This symlinks skills into Codex's skill directory. It bypasses the plugin system — hooks and metadata from `.claude-plugin/plugin.json` are not loaded.
+### Codex (marketplace)
 
-### Antigravity / Cursor
+Add the repo as a self-hosted marketplace, then install:
 
-These are IDE forks that run Claude Code as their agent backend. Install via Claude Code (see above), then use skills normally in any Antigravity or Cursor workspace.
-
-> Antigravity and Cursor do not have their own agent plugin systems.
+```bash
+codex plugin marketplace add https://github.com/Zpankz/create-workflow
+codex plugin add create-workflow@create-workflow-marketplace
+```
 
 ## Compatibility Matrix
 
-| Tool | Method | Plugin metadata | Skills | Hooks |
-|------|--------|----------------|--------|-------|
-| Claude Code | `claude plugin install` | Yes | Yes | Yes |
-| Pi | `pi install` | Yes | Yes | No |
-| Hermes | `hermes skills install` | No | Yes | No |
-| Codex | Manual symlink | No | Yes | No |
-| Antigravity | Via Claude Code | Via Claude Code | Via Claude Code | Via Claude Code |
+| Tool | Method | Manifest | Skills | Hooks | Agents |
+|------|--------|----------|--------|-------|--------|
+| Claude Code | `claude plugin install` | `.claude-plugin/plugin.json` | Yes | Generator | Generator |
+| Pi | `pi install` | `package.json` (`"pi"` key) | Yes | Generator | Generator |
+| Antigravity | `gemini extensions install` | `plugin.json` (root) | Yes | Generator | Generator |
+| Hermes | `hermes plugins install` | `plugin.yaml` + `__init__.py` | Yes | Generator | Generator |
+| Codex | `codex plugin marketplace add` | `.codex-plugin/plugin.json` | Yes | Generator | Generator |
+
+Skills are bundled and work natively. Hooks and agents are **generated** by the `generate-hooks` and `generate-agents` skills — they emit native output for whichever tool is running.
+
+### Generator Output
+
+The `generate-hooks` and `generate-agents` skills detect which tool is running and emit **native** output:
+
+| Generator | Claude Code | Antigravity | Hermes | Codex | Pi |
+|-----------|-----------|-------------|--------|-------|-----|
+| generate-hooks | settings.json | settings.json | Python ctx.register_hook() | hooks.json | TypeScript pi.on() |
+| generate-agents | .claude/agents/*.md | agents/*.md (with kind) | Python ctx.register_agent() | .agents/*.md | pi/agents/*.md |
 
 ## Primitive Taxonomy
 
@@ -80,8 +84,8 @@ Programmatic (deterministic, executed by runtime)
 | **generate-claudemd** | `/generate-claudemd` | Generate CLAUDE.md (shared context) |
 | **generate-rules** | `/generate-rules` | Generate .claude/rules/ (constraints) |
 | **generate-skills** | `/generate-skills` | Generate .claude/skills/ (capabilities) |
-| **generate-hooks** | `/generate-hooks` | Generate hooks in settings.json (reflexes) |
-| **generate-agents** | `/generate-agents` | Generate .claude/agents/ (specialists) |
+| **generate-hooks** | `/generate-hooks` | Generate hooks — native to active tool's runtime |
+| **generate-agents** | `/generate-agents` | Generate agents — native to active tool's format |
 | **generate-tools** | `/generate-tools` | Configure MCP servers and tool integrations |
 | **generate-workflows** | `/generate-workflows` | Generate workflow skills (orchestration, --dual-track for .js) |
 
@@ -97,12 +101,13 @@ Programmatic (deterministic, executed by runtime)
   |   |- Maintain CONTEXT.md glossary inline
   |   '- Create ADRs sparingly (hard to reverse + surprising + real trade-off)
   |- Phase 3: Compose — map decisions to primitives, generate in dependency order
+  |   |- Detect active tool — emit native formats
   |   |- Check for existing files — diff, don't overwrite
   |   |- CLAUDE.md      (shared context — everything references this)
   |   |- Rules          (constraints — agents and hooks enforce these)
   |   |- Skills         (capabilities — agents use these)
-  |   |- Hooks          (reflexes — automatic enforcement)
-  |   |- Agents         (specialists — use skills, follow rules)
+  |   |- Hooks          (reflexes — native to tool runtime)
+  |   |- Agents         (specialists — native to tool format)
   |   |- Tools          (instruments — agents and skills use these)
   |   '- Workflows      (orchestration — compose everything into pipelines)
   '- Phase 4: Verify — consistency, completeness, coherence
@@ -114,12 +119,25 @@ Each generator works independently:
 
 ```bash
 /generate-claudemd              # Just generate CLAUDE.md
-/generate-workflows --template=deploy  # Generate a deploy skill from template
-/generate-workflows --dual-track       # Generate both .js workflow AND skill
+/generate-hooks --tool=hermes   # Generate Python hooks for Hermes
+/generate-hooks --all-tools     # Generate hooks for all detected tools
+/generate-agents --tool=codex   # Generate agents with OpenAI model names
+/generate-workflows --dual-track # Generate both .js workflow AND skill
 /grill --topic=architecture     # Focused interrogation on architecture
 /scaffold --scan-only           # Just scan, report findings
 /scaffold --quick-grill         # Abbreviated interrogation (3-5 questions)
 ```
+
+## Cross-Tool Event Mapping
+
+The `generate-hooks` skill translates hook intent across tools:
+
+| Intent | Claude Code | Antigravity | Hermes | Codex | Pi |
+|--------|-----------|-------------|--------|-------|-----|
+| Before tool | PreToolUse | BeforeTool | pre_tool_call | PreToolUse | tool_execution_start |
+| After tool | PostToolUse | PostToolUse | post_tool_call | PostToolUse | tool_result |
+| Session start | — | SessionStart | on_session_start | SessionStart | session_start |
+| Turn/session end | Stop | SessionEnd | on_session_end | Stop | session_shutdown |
 
 ## References
 
