@@ -21,7 +21,7 @@ Skills (capabilities)
 
 ## Input
 
-Scan results, grill decisions, and the workflow design that determines what capabilities the system needs. Skills emerge from:
+Scan results, grill decisions, and the workflow design that determines what capabilities the system needs. Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. Skills emerge from:
 - Recurring multi-step workflows the user described
 - Complex processes that benefit from structured instructions
 - Domain-specific tasks requiring specialized knowledge
@@ -85,4 +85,4 @@ Body follows progressive disclosure:
 `$ARGUMENTS`:
 - `--list` — List candidate skills without generating
 - `--name=verify,deploy` — Generate only specified skills
-- `--quick-grill` — Use scan defaults
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)

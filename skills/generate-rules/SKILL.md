@@ -21,7 +21,7 @@ Rules (constraints)
 
 ## Input
 
-Scan results, grill decisions, and the workflow design that determines what invariants need protection. If standalone, scan first.
+Scan results, grill decisions, and the workflow design that determines what invariants need protection. Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. If standalone, scan first.
 
 ## Output
 
@@ -82,4 +82,4 @@ Rules without `paths` apply globally.
 
 `$ARGUMENTS`:
 - `--category=security,testing` — Generate only specified categories
-- `--quick-grill` — Use scan defaults
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)

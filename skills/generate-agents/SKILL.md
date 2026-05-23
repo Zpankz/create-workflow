@@ -15,6 +15,10 @@ Agents are **specialists** — team members with focused expertise. Each agent h
 - Specific instructions for its domain
 - A model selection matched to its task complexity
 
+## Input
+
+Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. Map workflow roles from decisions to agent definitions.
+
 ## Agent Definition Format
 
 ```yaml
@@ -94,4 +98,4 @@ Informational, not blocking. Agents can reference skills/rules that will be crea
 `$ARGUMENTS`:
 - `--list` — List candidate agents without generating
 - `--name=reviewer,tester` — Generate only specified agents
-- `--quick-grill` — Use scan defaults
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)

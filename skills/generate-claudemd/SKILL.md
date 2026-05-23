@@ -22,7 +22,7 @@ CLAUDE.md (shared memory)
 
 ## Input
 
-Scan results, grill decisions, and the workflow design that determines what shared context all primitives need. If invoked standalone, scan the repo first.
+Scan results, grill decisions, and the workflow design that determines what shared context all primitives need. Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. If invoked standalone, scan the repo first.
 
 ## Output Structure
 
@@ -105,5 +105,5 @@ If existing AI tool configs were found (AGENTS.md, .cursor/rules, etc.):
 
 `$ARGUMENTS`:
 - `--local` — Generate CLAUDE.local.md (personal, gitignored) instead of project CLAUDE.md
-- `--quick-grill` — Use scan defaults without interrogation
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)
 - `--append` — Add to existing CLAUDE.md instead of replacing

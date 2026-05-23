@@ -11,6 +11,10 @@ Produce hooks in `.claude/settings.json` (team-shared) or `.claude/settings.loca
 
 Hooks are **reflexes** — automatic responses to Claude Code events. They enforce rules without requiring Claude's cooperation. Unlike skills (on-demand), hooks fire every time their trigger condition is met.
 
+## Input
+
+Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. Map decisions to hooks using the table below.
+
 ## Hook Types
 
 | Event | Fires When | Use For |
@@ -86,4 +90,4 @@ This check is informational, not blocking. Hooks can be generated without rules,
 `$ARGUMENTS`:
 - `--format-only` — Generate only formatter hooks
 - `--personal` — Target settings.local.json
-- `--quick-grill` — Use scan defaults
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)

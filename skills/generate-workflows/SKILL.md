@@ -1,6 +1,6 @@
 ---
 name: generate-workflows
-description: Generate .claude/workflows/*.js orchestration scripts that compose agents, skills, hooks, and tools into automated pipelines. The workflow is the product — all other primitives serve it. Uses the Workflow DSL (agent/pipeline/parallel/phase/log). Invoked by scaffold or standalone via /generate-workflows.
+description: Generate workflow orchestration — skills (default) or .js scripts (--dual-track) — that compose agents, skills, hooks, and tools into automated pipelines. The workflow is the product — all other primitives serve it. Invoked by scaffold or standalone via /generate-workflows.
 ---
 
 # Generate Workflows
@@ -21,11 +21,15 @@ Workflow orchestrates:
   → CLAUDE.md (shared context for all participants)
 ```
 
+## Input
+
+Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. Extract the end-to-end workflow from the decision records.
+
 ## Workflow Design Process
 
 ### 1. Identify the Pipeline
 
-From grill decisions, extract the end-to-end flow:
+From grill decisions (in scaffold-decisions.md), extract the end-to-end flow:
 
 ```
 Trigger → Step 1 → Step 2 → ... → Output
@@ -51,50 +55,47 @@ Reference: `@references/workflow-dsl.md`
 export const meta = {
   name: "deploy-pipeline",
   description: "Build, test, stage, smoke-test, and promote to production",
-  phases: ["build", "test", "stage", "verify", "promote"]
+  phases: [
+    { title: "build", detail: "Compile artifacts" },
+    { title: "test", detail: "Run unit and integration tests" },
+    { title: "stage", detail: "Deploy to staging" },
+    { title: "verify", detail: "Smoke test staging" },
+    { title: "promote", detail: "Promote to production" }
+  ]
 };
 
-export default async function run({ agent, pipeline, parallel, phase, log }) {
-  phase("build");
-  log("Building artifacts...");
-  const build = await agent("Run the build process and report results", {
-    tools: ["Bash", "Read"],
-    structuredOutput: {
-      schema: {
-        type: "object",
-        properties: {
-          success: { type: "boolean" },
-          artifacts: { type: "array", items: { type: "string" } }
-        }
-      }
+// DSL functions (agent, pipeline, parallel, phase, log, workflow)
+// are top-level globals — no import or destructuring needed.
+
+phase("build");
+log("Building artifacts...");
+const build = await agent("Run the build process and report results", {
+  schema: {
+    type: "object",
+    properties: {
+      success: { type: "boolean" },
+      artifacts: { type: "array", items: { type: "string" } }
     }
-  });
+  }
+});
 
-  phase("test");
-  const [unit, integration] = await parallel(
-    () => agent("Run unit tests", { tools: ["Bash"] }),
-    () => agent("Run integration tests", { tools: ["Bash"] })
-  );
+phase("test");
+const [unit, integration] = await parallel(
+  () => agent("Run unit tests"),
+  () => agent("Run integration tests")
+);
 
-  phase("stage");
-  const staging = await agent("Deploy to staging environment", {
-    tools: ["Bash", "Read"]
-  });
+phase("stage");
+const staging = await agent("Deploy to staging environment");
 
-  phase("verify");
-  const smoke = await agent("Run smoke tests against staging", {
-    tools: ["Bash", "Read"],
-    model: "sonnet"
-  });
+phase("verify");
+const smoke = await agent("Run smoke tests against staging", {
+  model: "sonnet"
+});
 
-  phase("promote");
-  log("Promoting to production...");
-  const production = await agent("Promote staging to production", {
-    tools: ["Bash"]
-  });
-
-  return { build, unit, integration, staging, smoke, production };
-}
+phase("promote");
+log("Promoting to production...");
+const production = await agent("Promote staging to production");
 ```
 
 ## Common Workflow Templates
@@ -199,5 +200,5 @@ Informational, not blocking.
 `$ARGUMENTS`:
 - `--name=deploy,review` — Generate only specified workflows
 - `--dual-track` — Generate BOTH .js workflow script AND equivalent skill (default: skill-only)
-- `--quick-grill` — Use scan defaults
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)
 - `--template=research|review|deploy|investigate` — Start from a template

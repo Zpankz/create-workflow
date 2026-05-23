@@ -11,6 +11,10 @@ Configure tool integrations — MCP servers, CLI tools, and external service con
 
 Tools are **instruments** — they extend the system's reach beyond the local codebase. Agents use tools, skills reference tools, workflows orchestrate tools.
 
+## Input
+
+Read `.claude/scaffold-decisions.md` if it exists — this is the primary source for resolved grill decisions. Map workflow needs from decisions to tool configurations.
+
 ## Tool Categories
 
 ### MCP Servers
@@ -76,4 +80,4 @@ Project-specific tools in `scripts/` or `tools/`:
 
 `$ARGUMENTS`:
 - `--mcp-only` — Only configure MCP servers
-- `--quick-grill` — Use scan defaults
+- `--quick-grill` — Abbreviated interrogation (3-5 questions)

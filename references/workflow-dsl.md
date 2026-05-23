@@ -22,9 +22,18 @@ Every script must export a `meta` object as a pure literal:
 export const meta = {
   name: "my-workflow",
   description: "What this workflow does",
-  phases: ["phase-1", "phase-2"]  // optional
+  whenToUse: "Use when ...",  // optional
+  phases: [                    // optional
+    { title: "phase-1", detail: "..." },
+    { title: "phase-2", detail: "..." }
+  ]
 };
 ```
+
+DSL functions (`agent`, `pipeline`, `parallel`, `phase`, `log`, `workflow`) are available as **top-level globals** in the script scope. Two additional globals:
+
+- `args` — optional input value passed by the Workflow tool invocation
+- `budget` — token-budget object with `total()`, `spent()`, `remaining()` functions
 
 ## DSL Functions
 
@@ -35,29 +44,36 @@ Spawn a Claude Code subagent. Core orchestration primitive.
 ```javascript
 const result = await agent("Analyze the auth module for security issues", {
   model: "opus",
-  tools: ["Read", "Grep", "Glob"],
-  structuredOutput: { schema: myJsonSchema },
-  permissionMode: "plan"
+  schema: myJsonSchema,
+  label: "security-audit",
+  phase: "analysis",
+  isolation: "worktree",
+  agentType: "security-reviewer"
 });
 ```
 
 Options:
 - `model` — Model selection (haiku, sonnet, opus)
-- `tools` — Tool allowlist for this agent
-- `structuredOutput` — JSON Schema for typed result
-- `permissionMode` — Permission level for the agent
+- `schema` — JSON Schema for typed/structured result
+- `label` — Display label for the agent call
+- `phase` — Associate with a named phase
+- `isolation` — `"worktree"` for git worktree isolation
+- `agentType` — Agent definition to use (e.g., custom agent type)
+
+> **Note**: Binary extraction also shows `tools` and `permissionMode` in some code paths but these are not confirmed in the PRD schema. Use with caution.
 
 Cached on resume: completed `agent()` calls with unchanged prompt and opts are reused when `resumeFromRunId` is set.
 
-### `pipeline(...stages)`
+### `pipeline(items, stage1, stage2, ...)`
 
-Stream items through staged transformations:
+Stream items through staged functions with no barrier between stages:
 
 ```javascript
 const result = await pipeline(
-  () => agent("Find all API endpoints"),
-  (endpoints) => agent(`Review these endpoints: ${JSON.stringify(endpoints)}`),
-  (findings) => agent(`Write a security report: ${JSON.stringify(findings)}`)
+  items,
+  (batch) => agent(`Classify these items: ${JSON.stringify(batch)}`),
+  (classified) => agent(`Review classified items: ${JSON.stringify(classified)}`),
+  (findings) => agent(`Write a report: ${JSON.stringify(findings)}`)
 );
 ```
 
@@ -96,9 +112,13 @@ Emit progress messages:
 log("Starting security audit...");
 ```
 
-### `workflow(config)`
+### `workflow(nameOrRef, args?)`
 
-Top-level workflow invocation (for nested/chained workflows).
+Invoke another workflow inline. **One nesting level only** — a child workflow cannot invoke further workflows.
+
+```javascript
+const subResult = await workflow("review-branch", { target: "src/auth/" });
+```
 
 ## Sandbox Constraints
 
@@ -110,6 +130,8 @@ Top-level workflow invocation (for nested/chained workflows).
 | Resume | Same session only, via `resumeFromRunId` |
 | Remote isolation | `agent({isolation:'remote'})` not available in current build |
 | SDK types | `WorkflowInput` absent from `sdk-tools.d.ts` |
+| Nesting depth | `workflow()` calls limited to one nesting level |
+| Plugin paths | Plugin-scoped workflow directories are resolved but not publicly documented |
 
 Nondeterminism is blocked to enable deterministic replay — `resumeFromRunId` skips completed agent calls when prompt+opts are unchanged.
 

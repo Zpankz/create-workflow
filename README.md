@@ -23,7 +23,7 @@ claude /install /path/to/create-workflow
 | **generate-hooks** | `/generate-hooks` | Generate hooks in settings.json (reflexes) |
 | **generate-agents** | `/generate-agents` | Generate .claude/agents/ (specialists) |
 | **generate-tools** | `/generate-tools` | Configure MCP servers and tool integrations |
-| **generate-workflows** | `/generate-workflows` | Generate .claude/workflows/*.js (orchestration) |
+| **generate-workflows** | `/generate-workflows` | Generate workflow skills (orchestration, --dual-track for .js) |
 
 ## How It Works
 
@@ -33,9 +33,11 @@ claude /install /path/to/create-workflow
   ├── Phase 2: Grill — structured interrogation, one question at a time
   │   ├── Recommend answers based on scan findings
   │   ├── Explore code before asking
+  │   ├── Persist decisions to .claude/scaffold-decisions.md inline
   │   ├── Maintain CONTEXT.md glossary inline
   │   └── Create ADRs sparingly (hard to reverse + surprising + real trade-off)
   ├── Phase 3: Compose — map decisions to primitives, generate in dependency order
+  │   ├── Check for existing files — diff, don't overwrite
   │   ├── CLAUDE.md      (shared context — everything references this)
   │   ├── Rules          (constraints — agents and hooks enforce these)
   │   ├── Skills         (capabilities — agents use these)
