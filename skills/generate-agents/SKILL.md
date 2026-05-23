@@ -145,11 +145,11 @@ Pi shares Claude Code's model names (Anthropic provider).
 
 When translating agents between tools, map models by capability tier:
 
-| Tier | Claude Code | Antigravity/Gemini | Codex | Pi |
-|------|-----------|-------------------|-------|-----|
-| Fast/cheap | haiku | gemini-2.5-flash | o4-mini | haiku |
-| Balanced | sonnet | gemini-2.5-flash | gpt-4.1 | sonnet |
-| Deep reasoning | opus | gemini-2.5-pro | o3 | opus |
+| Tier | Claude Code | Antigravity/Gemini | Hermes | Codex | Pi |
+|------|-----------|-------------------|--------|-------|-----|
+| Fast/cheap | haiku | gemini-2.5-flash | haiku | o4-mini | haiku |
+| Balanced | sonnet | gemini-2.5-flash | sonnet | gpt-4.1 | sonnet |
+| Deep reasoning | opus | gemini-2.5-pro | opus | o3 | opus |
 
 ## Input
 
