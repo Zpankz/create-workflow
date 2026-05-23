@@ -1,6 +1,6 @@
 ---
 name: generate-workflows
-description: Generate workflow orchestration — skills (default) or .js scripts (--dual-track) — that compose agents, skills, hooks, and tools into automated pipelines. The workflow is the product — all other primitives serve it. Invoked by scaffold or standalone via /generate-workflows.
+description: Generate .workflow.js scripts that compose agents, skills, hooks, and tools into automated pipelines. Produces both .js scripts and equivalent skills by default. The workflow is the product — all other primitives serve it. Invoked by scaffold or standalone via /generate-workflows.
 ---
 
 # Generate Workflows
@@ -138,21 +138,27 @@ Pattern: `pipeline()` stages with `schema` passing typed data between stages.
 
 ## Dual-Track Strategy
 
-The Workflow DSL is gated (`CLAUDE_CODE_WORKFLOWS` + `tengu_workflows_enabled`).
+**Default: both.** Generate the `.workflow.js` script AND an equivalent skill for every workflow. The .js script is the primary artifact; the skill provides a fallback that works without the workflow gate.
 
-**Default: skill-only.** Generate the equivalent skill that works today. Only generate the `.js` workflow script when explicitly requested via `--dual-track`.
+1. **Workflow script** (`.claude/workflows/<name>.workflow.js`) — primary orchestration artifact **(always generated)**
+2. **Skill** (`.claude/skills/<name>/SKILL.md`) — equivalent logic using Agent tool calls **(always generated)**
 
-When generating both tracks:
-
-1. **Skill** (`.claude/skills/<name>/SKILL.md`) — works today using subagents **(always generated)**
-2. **Workflow script** (`.claude/workflows/<name>.js`) — ready for when the gate opens **(only with --dual-track)**
+Use `--js-only` to skip skill generation, or `--skill-only` to skip .js generation.
 
 **Cross-reference both artifacts** to prevent drift:
-- In the skill: `<!-- Workflow equivalent: .claude/workflows/<name>.js -->`
+- In the skill: `<!-- Workflow equivalent: .claude/workflows/<name>.workflow.js -->`
 - In the .js file: `// Skill equivalent: .claude/skills/<name>/SKILL.md`
 - Add a comment in both: `// WARNING: If you modify this file, update its counterpart to stay in sync`
 
-The skill mirrors the workflow's logic using Agent tool calls instead of DSL `agent()` calls. When the workflow gate opens, the skill becomes a thin wrapper or is retired.
+The skill mirrors the workflow's logic using Agent tool calls instead of DSL `agent()` calls.
+
+### Workflow Gate Detection
+
+The workflow DSL requires `CLAUDE_CODE_WORKFLOWS=1`. When generating:
+
+1. Check if the gate is set — if yes, the .js file is immediately usable
+2. If not set, note in the output that the user can enable it: `export CLAUDE_CODE_WORKFLOWS=1`
+3. The skill fallback works regardless of gate status
 
 ## Sandbox Awareness
 
@@ -199,6 +205,7 @@ Informational, not blocking.
 
 `$ARGUMENTS`:
 - `--name=deploy,review` — Generate only specified workflows
-- `--dual-track` — Generate BOTH .js workflow script AND equivalent skill (default: skill-only)
+- `--js-only` — Generate only .workflow.js scripts (skip skill fallbacks)
+- `--skill-only` — Generate only skill equivalents (skip .js scripts)
 - `--quick-grill` — Abbreviated interrogation (3-5 questions)
 - `--template=research|review|deploy|investigate` — Start from a template
