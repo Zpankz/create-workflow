@@ -70,6 +70,15 @@ Default to team-shared unless the hook is personal preference (e.g., notificatio
 - Keep commands fast — hooks run on every trigger
 - Validate resulting JSON with `jq -e`
 
+## Upstream Dependencies
+
+When invoked standalone, check for upstream primitives before generating:
+
+- **Rules** (`.claude/rules/`): If empty or missing, warn: "No rules found. Hooks enforce rules — consider running `/generate-rules` first." Offer to continue anyway or run rules first.
+- **CLAUDE.md**: If missing, warn similarly. Hooks implicitly enforce CLAUDE.md standards.
+
+This check is informational, not blocking. Hooks can be generated without rules, but the user should know the enforcement target doesn't exist yet.
+
 ## Standalone Invocation
 
 `/generate-hooks`
@@ -77,4 +86,4 @@ Default to team-shared unless the hook is personal preference (e.g., notificatio
 `$ARGUMENTS`:
 - `--format-only` — Generate only formatter hooks
 - `--personal` — Target settings.local.json
-- `--skip-grill` — Use scan defaults
+- `--quick-grill` — Use scan defaults

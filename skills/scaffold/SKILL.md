@@ -46,6 +46,25 @@ Synthesize findings into a **system map** — not raw output, but a concise mode
 
 Run grill-with-docs to design the target workflow system. The grill isn't about config preferences — it's about understanding the workflow the user needs.
 
+#### Decision Persistence
+
+**Write each resolved decision to `.claude/scaffold-decisions.md` immediately.** Do not rely on conversation context alone — compaction will degrade it.
+
+Format:
+```markdown
+## Decisions
+
+### D1: [Decision Title]
+- **Resolved**: [what was decided]
+- **Primitives**: [which primitives this maps to, e.g., Hook + Rule + CLAUDE.md]
+- **Rationale**: [why, in one line]
+
+### D2: [Decision Title]
+...
+```
+
+Create the file lazily on first resolved decision. Generators read this file as primary input — conversation context is supplemental.
+
 #### Grill Rules
 
 1. **One question at a time.** Never batch.
@@ -55,7 +74,8 @@ Run grill-with-docs to design the target workflow system. The grill isn't about 
 5. **Sharpen fuzzy language.** Propose precise terms.
 6. **Cross-reference with code.** Verify claims against the codebase.
 7. **Update CONTEXT.md inline.** As terms resolve, write immediately.
-8. **ADRs sparingly.** Only when ALL THREE: hard to reverse + surprising + real trade-off.
+8. **Persist decisions inline.** Write to `.claude/scaffold-decisions.md` as each decision resolves.
+9. **ADRs sparingly.** Only when ALL THREE: hard to reverse + surprising + real trade-off.
 
 #### Grill Topics (workflow-oriented)
 
@@ -87,6 +107,19 @@ Decision: "Deploy process is: build → test → stage → smoke test → promot
 ```
 
 ### Phase 3: Compose the System
+
+#### Existing File Protection
+
+Before invoking each generator, check for existing files it would create. For each existing file:
+
+1. **Read the existing file** — understand what's already there
+2. **Diff, don't overwrite** — propose additions/removals with one-line reasons
+3. **Ask before replacing** — "Apply these changes?" with options: Apply all / Let me pick / Skip
+4. **Respect --append** — pass `--append` to generate-claudemd if CLAUDE.md already exists
+
+Generators that find existing `.claude/rules/`, `.claude/skills/`, or `.claude/agents/` must complement, not duplicate. Scan existing artifacts first.
+
+#### Primitive Mapping
 
 Map resolved decisions to primitives. This is systems thinking — each primitive has a role:
 
@@ -120,11 +153,12 @@ Skip generators when the grill determined they're not needed.
 
 After generation:
 
-1. **Consistency check** — Do primitives reference each other correctly? Does a hook reference a rule that exists? Does a workflow invoke agents that are defined?
-2. **Completeness check** — Does every grill decision map to at least one primitive? Are there gaps?
-3. **Coherence check** — Do the primitives compose into the workflow the user described? Walk through the workflow end-to-end using the generated primitives.
-4. **Security check** — No hardcoded secrets, no sensitive data in generated files.
-5. **Present the system** — Show the full primitive tree with one-line descriptions. Explain how the workflow flows through the primitives.
+1. **Reconcile CLAUDE.md** — Re-read CLAUDE.md and update its Workflow section to match actual generated artifacts. CLAUDE.md was generated first (step 1) but summarizes things defined in steps 2-7. Ensure the workflow description, agent names, and skill references match what was actually produced.
+2. **Consistency check** — Read `.claude/scaffold-decisions.md` and verify each decision maps to at least one generated primitive. Check that hooks reference rules that exist, workflows invoke agents that are defined, and agents reference skills that exist.
+3. **Completeness check** — Does every grill decision in the decisions file map to at least one primitive? List any gaps.
+4. **Coherence check** — Walk through the workflow end-to-end using the generated primitives. Do they compose into the workflow the user described?
+5. **Security check** — No hardcoded secrets, no sensitive data in generated files.
+6. **Present the system** — Show the full primitive tree with one-line descriptions. Explain how the workflow flows through the primitives.
 
 ## Invocation
 
@@ -132,7 +166,7 @@ After generation:
 
 `$ARGUMENTS`:
 - `--scan-only` — Phase 1 only, report system map
-- `--skip-grill` — Use scan defaults (fast, less accurate)
+- `--quick-grill` — Ask 3-5 high-signal questions instead of full interrogation (fast, less accurate). Warns that output will be generic and may not reflect actual workflow.
 - `--generators=claudemd,rules,hooks` — Run only specified generators
 - `--dry-run` — Show the workflow design without writing files
 - `--workflow=deploy` — Focus scaffold on a specific workflow

@@ -18,7 +18,8 @@ Full grilling pattern: `@references/grilling.md`
 3. For each question: recommend an answer based on what you found
 4. If code answers the question, explore instead of asking
 5. When a term resolves, update CONTEXT.md immediately
-6. When a decision meets all 3 ADR criteria, write the ADR
+6. When a decision resolves, write it to `.claude/scaffold-decisions.md` immediately
+7. When a decision meets all 3 ADR criteria, write the ADR
 
 ## Modes
 

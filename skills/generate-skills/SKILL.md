@@ -85,4 +85,4 @@ Body follows progressive disclosure:
 `$ARGUMENTS`:
 - `--list` — List candidate skills without generating
 - `--name=verify,deploy` — Generate only specified skills
-- `--skip-grill` — Use scan defaults
+- `--quick-grill` — Use scan defaults

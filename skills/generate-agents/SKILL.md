@@ -72,6 +72,15 @@ Agents participate in workflows through:
 3. **Pipeline stages** — Workflow scripts invoke agents sequentially
 4. **Parallel analysis** — Multiple agents analyze the same change from different angles
 
+## Upstream Dependencies
+
+When invoked standalone, check for upstream primitives:
+
+- **Skills** (`.claude/skills/`): If empty, warn: "No skills found. Agents execute skills — consider running `/generate-skills` first."
+- **Rules** (`.claude/rules/`): If empty, warn: "No rules found. Agents follow rules — consider running `/generate-rules` first."
+
+Informational, not blocking. Agents can reference skills/rules that will be created later.
+
 ## Don't Create Agents For
 
 - Tasks that are a single command (use a hook or alias)
@@ -85,4 +94,4 @@ Agents participate in workflows through:
 `$ARGUMENTS`:
 - `--list` — List candidate agents without generating
 - `--name=reviewer,tester` — Generate only specified agents
-- `--skip-grill` — Use scan defaults
+- `--quick-grill` — Use scan defaults

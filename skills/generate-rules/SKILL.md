@@ -78,8 +78,8 @@ Rules without `paths` apply globally.
 
 ## Standalone Invocation
 
-`/generate-rules` — scan + generate. Skip grill with `--skip-grill`.
+`/generate-rules` — scan + generate. Use `--quick-grill` for abbreviated interrogation.
 
 `$ARGUMENTS`:
 - `--category=security,testing` — Generate only specified categories
-- `--skip-grill` — Use scan defaults
+- `--quick-grill` — Use scan defaults

@@ -66,9 +66,11 @@ Each generator works independently:
 
 ```bash
 /generate-claudemd              # Just generate CLAUDE.md
-/generate-workflows --template=deploy  # Generate a deploy workflow from template
+/generate-workflows --template=deploy  # Generate a deploy skill from template
+/generate-workflows --dual-track       # Generate both .js workflow AND skill
 /grill --topic=architecture     # Focused interrogation on architecture
 /scaffold --scan-only           # Just scan, report findings
+/scaffold --quick-grill         # Abbreviated interrogation (3-5 questions)
 ```
 
 ## References

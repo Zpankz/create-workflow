@@ -76,4 +76,4 @@ Project-specific tools in `scripts/` or `tools/`:
 
 `$ARGUMENTS`:
 - `--mcp-only` — Only configure MCP servers
-- `--skip-grill` — Use scan defaults
+- `--quick-grill` — Use scan defaults

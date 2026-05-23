@@ -137,10 +137,19 @@ Pattern: `pipeline()` stages with `structuredOutput` passing typed data between 
 
 ## Dual-Track Strategy
 
-The Workflow DSL is gated (`CLAUDE_CODE_WORKFLOWS` + `tengu_workflows_enabled`). Generate both:
+The Workflow DSL is gated (`CLAUDE_CODE_WORKFLOWS` + `tengu_workflows_enabled`).
 
-1. **Workflow script** (`.claude/workflows/<name>.js`) — ready for when the gate opens
-2. **Equivalent skill** (`.claude/skills/<name>/SKILL.md`) — works today using subagents
+**Default: skill-only.** Generate the equivalent skill that works today. Only generate the `.js` workflow script when explicitly requested via `--dual-track`.
+
+When generating both tracks:
+
+1. **Skill** (`.claude/skills/<name>/SKILL.md`) — works today using subagents **(always generated)**
+2. **Workflow script** (`.claude/workflows/<name>.js`) — ready for when the gate opens **(only with --dual-track)**
+
+**Cross-reference both artifacts** to prevent drift:
+- In the skill: `<!-- Workflow equivalent: .claude/workflows/<name>.js -->`
+- In the .js file: `// Skill equivalent: .claude/skills/<name>/SKILL.md`
+- Add a comment in both: `// WARNING: If you modify this file, update its counterpart to stay in sync`
 
 The skill mirrors the workflow's logic using Agent tool calls instead of DSL `agent()` calls. When the workflow gate opens, the skill becomes a thin wrapper or is retired.
 
@@ -154,6 +163,16 @@ Workflow scripts run in a sandboxed JS VM:
 
 Design accordingly. All external interaction goes through `agent()` calls — agents have tool access, scripts don't.
 
+### Sandbox Validation (when generating .js files)
+
+After generating a workflow .js file, scan it for sandbox violations before writing:
+
+- `require(`, `import` from `node:`, `fs.`, `path.` → filesystem/Node.js API violation
+- `Date.now()`, `new Date()` (argless), `Math.random()` → nondeterminism violation
+- Check file size < 524KB
+
+Report violations inline and fix before writing. This prevents scripts from silently failing when the gate opens.
+
 ## Generation Rules
 
 - Every `agent()` call gets explicit `tools` — don't leave it open
@@ -163,12 +182,22 @@ Design accordingly. All external interaction goes through `agent()` calls — ag
 - Keep scripts focused — one workflow per concern
 - Name workflows by what they accomplish, not how they work
 
+## Upstream Dependencies
+
+When invoked standalone, check for upstream primitives:
+
+- **Agents** (`.claude/agents/`): If empty, warn: "No agents found. Workflows orchestrate agents — consider running `/generate-agents` first."
+- **Skills** (`.claude/skills/`): If empty, warn similarly.
+- **CLAUDE.md**: If missing, warn: "No CLAUDE.md found. Workflows depend on shared context."
+
+Informational, not blocking.
+
 ## Standalone Invocation
 
 `/generate-workflows`
 
 `$ARGUMENTS`:
 - `--name=deploy,review` — Generate only specified workflows
-- `--skill-only` — Generate equivalent skills, skip .js workflow scripts
-- `--skip-grill` — Use scan defaults
+- `--dual-track` — Generate BOTH .js workflow script AND equivalent skill (default: skill-only)
+- `--quick-grill` — Use scan defaults
 - `--template=research|review|deploy|investigate` — Start from a template

@@ -101,9 +101,9 @@ If existing AI tool configs were found (AGENTS.md, .cursor/rules, etc.):
 
 ## Standalone Invocation
 
-`/generate-claudemd` — scan the repo first, then generate. Skip grill if `--skip-grill` passed.
+`/generate-claudemd` — scan the repo first, then generate. Use `--quick-grill` for abbreviated interrogation.
 
 `$ARGUMENTS`:
 - `--local` — Generate CLAUDE.local.md (personal, gitignored) instead of project CLAUDE.md
-- `--skip-grill` — Use scan defaults without interrogation
+- `--quick-grill` — Use scan defaults without interrogation
 - `--append` — Add to existing CLAUDE.md instead of replacing
