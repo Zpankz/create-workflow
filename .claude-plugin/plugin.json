@@ -1,0 +1,9 @@
+{
+  "name": "create-workflow",
+  "version": "1.0.0",
+  "description": "Grill-driven scaffolding that generates CLAUDE.md, rules, skills, hooks, agents, tools, and workflows for any repository. Uses structured interrogation (grill-with-docs) to produce context-aware Claude Code configuration.",
+  "author": {
+    "name": "Mikhail",
+    "email": "mikhail.hani@gmail.com"
+  }
+}
